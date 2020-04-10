@@ -15,9 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from rest_framework.authtoken import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     #enlazamos el archivo de ruta del app con el proyecto
-    path('api/1.0/',include(('api.urls','api')))
+    path('api/1.0/',include(('api.urls','api'))),
+    #generador de tokens de usuario estos deben ser via POST (Se puede validar en Postman)
+    path('api_generate_token/',views.obtain_auth_token),
 ]
