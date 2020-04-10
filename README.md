@@ -137,3 +137,34 @@ Se diseñara un login que guarde el Token del usuario que inicie sesión y se ca
  1. Crear un template templates/login.html
  2. Crear dos clases que permita la creación del usuario con su Token y cerrar sesión con la eliminación del Token en api/views.py 
  3. Llamar las clases para iniciar y cerrar sesión login_rest/url.py
+
+## Opciones para documentar API
+
+-- Habilitar en el settings.py las schamas
+
+```sh
+
+REST_FRAMEWORK = { 
+        'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
+    }
+
+```
+
+- Instalar las siguientes librerias
+-- coreapi
+-- django-rest-swagger
+
+- Añadir las rutas de la documentación:
+
+```sh
+from rest_framework.documentation import include_docs_urls
+from rest_framework_swagger.views import get_swagger_view
+
+schema_view = get_swagger_view(title='api')
+
+urlpatterns = [
+    ...
+    path('docs/', include_docs_urls(title='api')),
+    path(r'swagger-docs/', schema_view),
+]
+```

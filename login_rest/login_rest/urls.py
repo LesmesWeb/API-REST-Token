@@ -17,6 +17,10 @@ from django.contrib import admin
 from django.urls import path,include
 from rest_framework.authtoken import views
 from api.views import Login,Logout
+from rest_framework.documentation import include_docs_urls
+from rest_framework_swagger.views import get_swagger_view
+
+schema_view = get_swagger_view(title='api')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,5 +30,6 @@ urlpatterns = [
     path('api_generate_token/',views.obtain_auth_token),
     path('login/',Login.as_view(), name = 'login'),
     path('logout/', Logout.as_view()),
-    
+    path('docs/', include_docs_urls(title='api')),
+    path(r'swagger-docs/', schema_view),
 ]

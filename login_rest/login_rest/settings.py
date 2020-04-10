@@ -40,9 +40,13 @@ INSTALLED_APPS = [
     'rest_framework.authtoken', #aplicación para generar la tabla tokens
     'rest_framework', #servicio rest
     'api', #app creada
+    'rest_framework_swagger', #documentación
 
 ]
 
+REST_FRAMEWORK = { 
+        'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
+    }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
