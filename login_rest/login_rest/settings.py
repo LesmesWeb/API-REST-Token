@@ -43,16 +43,6 @@ INSTALLED_APPS = [
 
 ]
 
-#Configuración global para todas las clases que existan en el proyecto
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES':(
-        'rest_framework.permissions.IsAuthenticated', #verificar si el usuario inicio sesión antes de acceder a una ruta del API
-    ),
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication', #Metodo de autenticación por TOKEN
-    ),
-}
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -69,7 +59,7 @@ ROOT_URLCONF = 'login_rest.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

@@ -129,3 +129,11 @@ http http://localhost:8000/api/1.0/persona/ "Authorization: Token 62c36405d49279
 
 En **Postman** seria de la siguiente manera:
 ![postman validación lista de personas](https://lh3.googleusercontent.com/KIndtpZ-81yiBIf2yKjfkw0KhBo915SooU4D3TrQvY6-E8dou_uXvrrPPAuFbN9Wxpv5VmknghoyGrrktIXO1W7Dl4ltFwo7x7RHqcb3rmWJuXbVDkjB6UwOIZi1Uj-f_6hmWYnwYe8U1Wpw9-bXUXjXGpMe_D0biouX5ZeAM1rrH8khfwYNZAuOHohmkK7nR4J1vE7vD5xmBMkexBIeZc2-Vzxw_CI35ZKvJ7jsx0Qp2BdRw-jHoQgx2o8e23TiS6Ra3gazz5oF4uZXc7UrSMcFHK6egDgY7yhkW2gxfrnBHJfkNtq1GmgFvzMKNOjqLB4td3_megcZE7-AQuiz_kHDTBgRqvbRXC-EiRgfTT6Xr8qCTL5ffGfeWoGzwv3W52zl8Uz15GKVAEeHv4fgcVE_gsBtE00Xv742TZWFH4yfjsBPdLpb_mMwFU6BSgZaHVEgLUNUB14B6fjKeunqNE3NA7W-jUbx1Cb8ds3rpb8EjTtOYmVElsV1ZwfWes5HcKhsktfGNjeigwYK_0bFtV45zXmiopBWa3DOETBQhH7g1SXyoKtKtsw0r8Dj8dURMvxrpZ5HaPqIL1AmOzm9paE6jry2ycqJVDI-gHFlwrfykTrXnGaVEu2J0TSIkrkFFuAHm39IYgNMppHn--BhOi7mGtM5gbM1UhhJqJaPj443MlQfJFcpbDmXae7Yxg=w980-h729-no)
+
+## Login y Logout Token authentication
+
+Se diseñara un login que guarde el Token del usuario que inicie sesión y se cambiara el permiso directamente en la clase, además se incluirá la opción de cerrar sesión y que se elimine el Token:
+
+ 1. Crear un template templates/login.html
+ 2. Crear dos clases que permita la creación del usuario con su Token y cerrar sesión con la eliminación del Token en api/views.py 
+ 3. Llamar las clases para iniciar y cerrar sesión login_rest/url.py
