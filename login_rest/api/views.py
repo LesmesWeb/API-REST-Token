@@ -9,8 +9,8 @@ from rest_framework.authentication import TokenAuthentication
 class PersonaList(generics.ListCreateAPIView):
      queryset  = Persona.objects.all()
      serializer_class = PersonaSerializer
-     permission_classes = (IsAuthenticated,)
-     authentication_class = (TokenAuthentication,)
+     #permission_classes = (IsAuthenticated,)
+     #authentication_class = (TokenAuthentication,)
 
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator

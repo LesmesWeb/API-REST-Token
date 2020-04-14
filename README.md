@@ -168,3 +168,30 @@ urlpatterns = [
     path(r'swagger-docs/', schema_view),
 ]
 ```
+## Añadir Cors
+
+- Instalar lo siguiente:
+-- pip install django-cors-headers
+
+--Configurar el setting.py
+
+```sh
+
+CORS_ORIGIN_ALLOW_ALL=True
+
+INSTALLED_APPS = [
+    ...
+    'corsheaders',
+    ...
+]
+
+
+MIDDLEWARE_CLASSES = [
+    ...
+    'corsheaders.middleware.CorsMiddleware',
+    ...
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsPostCsrfMiddleware',
+    ...
+]
+```

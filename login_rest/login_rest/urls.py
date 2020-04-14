@@ -27,7 +27,7 @@ urlpatterns = [
     #enlazamos el archivo de ruta del app con el proyecto
     path('api/1.0/',include(('api.urls','api'))),
     #generador de tokens de usuario estos deben ser via POST (Se puede validar en Postman)
-    path('api_generate_token/',views.obtain_auth_token),
+    #path('api_generate_token/',views.obtain_auth_token),
     path('login/',Login.as_view(), name = 'login'),
     path('logout/', Logout.as_view()),
     path('docs/', include_docs_urls(title='api')),

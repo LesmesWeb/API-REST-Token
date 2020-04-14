@@ -25,7 +25,7 @@ SECRET_KEY = '$eo62^2^gc%#hzx+9)i=1$7y(ktn)p#o)_+9@h7d&3ipq9-$fd'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -41,8 +41,9 @@ INSTALLED_APPS = [
     'rest_framework', #servicio rest
     'api', #app creada
     'rest_framework_swagger', #documentación
-
+    'corsheaders', #Cors
 ]
+
 
 REST_FRAMEWORK = { 
         'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
@@ -56,9 +57,15 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsPostCsrfMiddleware',
+
 ]
 
 ROOT_URLCONF = 'login_rest.urls'
+CORS_ORIGIN_ALLOW_ALL=True
 
 TEMPLATES = [
     {
