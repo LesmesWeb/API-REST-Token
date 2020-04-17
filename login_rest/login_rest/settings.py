@@ -45,9 +45,7 @@ INSTALLED_APPS = [
 ]
 
 
-REST_FRAMEWORK = { 
-        'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
-    }
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -88,13 +86,25 @@ WSGI_APPLICATION = 'login_rest.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
+#Conexión con SQLite
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#    }
+#}
 
+#Conexión con Postgresql
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
+     'default': {
+         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+         'NAME': 'api_restdb',
+         'USER': 'postgres',
+         'PASSWORD': '<PASSWORD>',
+         'HOST': '127.0.0.1', #IP publica
+         'PORT': 5432,
+     }
+ }
 
 
 # Password validation
