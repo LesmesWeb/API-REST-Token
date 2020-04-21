@@ -19,17 +19,21 @@ from rest_framework.authtoken import views
 from api.views import Login,Logout
 from rest_framework.documentation import include_docs_urls
 from rest_framework_swagger.views import get_swagger_view
+from rest_framework.authtoken import views
 
-schema_view = get_swagger_view(title='api')
+schema_view = get_swagger_view(title='Documentación API Vehiculos')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    #enlazamos el archivo de ruta del app con el proyecto
-    path('api/1.0/',include(('api.urls','api'))),
-    #generador de tokens de usuario estos deben ser via POST (Se puede validar en Postman)
-    #path('api_generate_token/',views.obtain_auth_token),
-    path('login/',Login.as_view(), name = 'login'),
+    path('api_generate_token/',views.obtain_auth_token),
+
+    path('',Login.as_view(), name = 'login'),
     path('logout/', Logout.as_view()),
-    path('docs/', include_docs_urls(title='api')),
-    path(r'swagger-docs/', schema_view),
+    
+    #enlazamos el archivo de ruta del app con el proyecto
+    path('api/1.1/',include(('api.urls','api'))),
+    
+    #Urls de librerias de documentacion
+    path('docs/', include_docs_urls(title='Documentación API Vehiculos')),
+    path(r'documentacion/', schema_view), #Documentación Principal 
 ]

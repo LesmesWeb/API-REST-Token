@@ -1,6 +1,57 @@
-# API Rest Login Token
 
-Este proyecto esta basado en la documentación de Django Rest con apoyo del tutorial de [Developer.pe](https://www.youtube.com/watch?v=kh4YFQrvVyE&list=PLMbRqrU_kvbRzgD2s7JHvJxGs6FdvFjg9&index=6) y mas adelante se implementara la documentación del API con la librería **coreapi** vale aclarar que hay se añadirán conocimientos que he adquirido.
+# API Rest Vehículos - PowerBI
+
+Este proyecto esta basado en la documentación de Django Rest con apoyo en el uso de autenticación REST del tutorial de [Developer.pe](https://www.youtube.com/watch?v=kh4YFQrvVyE&list=PLMbRqrU_kvbRzgD2s7JHvJxGs6FdvFjg9&index=6) , este es un proyecto de aprendizaje personal, el cual esta abierto para recibir sugerencias y si es posible añadir nuevos elementos.
+
+Actualmente cuenta con una base de datos en PostgreSQL que contiene las siguientes tablas:
+
+![MER ACTUAL](https://raw.githubusercontent.com/Dev-Lesmes/API-REST-Token/master/img_documentacion/MER_ALL_MODELS.png)
+
+## DEMO  POWERBI v1.1
+[https://app.powerbi.com/view?r=eyJrIjoiZDMwN2E2OTUtZDc4OC00OTMxLTgxZTgtMzQ3MGYyNTRmNTVkIiwidCI6IjVlNmY0NzE0LTk4YmQtNGRhMS1hOGY1LTNjYTQ1OWVhYmRjOSIsImMiOjR9](https://app.powerbi.com/view?r=eyJrIjoiZDMwN2E2OTUtZDc4OC00OTMxLTgxZTgtMzQ3MGYyNTRmNTVkIiwidCI6IjVlNmY0NzE0LTk4YmQtNGRhMS1hOGY1LTNjYTQ1OWVhYmRjOSIsImMiOjR9)
+
+Cuenta con los siguiente elementos:
+
+ - **CORS:** para conexiones desde otros equipos (aclarar que para que funcione se debe correr de la siguiente manera: python3 manage.py runserver 0.0.0.0 y se llama con la IP local del equipo.
+ - **Documentación:**  cuenta con el apartado de la documentación ya implementado usando la librerías como: **swagger** y **coreapi**.
+ - **Token:** Autenticación por Token y cierre de sesión
+ - **Serializers:** en el que podemos obtener la lista y detalle de los vehículos con sus personas, de la misma manera las personas que tienen los vehiculos (manytomany). Por ultimo se genero una lista usuarios con su lista de grupos.
+ - **PowerBI:** Se desarrollo una plantilla que consume los datos del API para generar gráficas para asegurarnos que el consumo del API rest fue el correcto
+
+-- Desde este punto se incluye los pasos relevantes del proyecto, al igual en los **commits** puede visualizar lo que se ha ido realizando.
+
+## Ejecución del Proyecto
+
+```sh
+$source rest_env/bin/activate           #Activar entorno
+$cd ..                                  #regresar
+$pip3 install -r requirements.txt       #Instalar paquetes pip3
+$cd /login_rest                         #ingresar a la carpeta del proyecto
+$python3 manage.py runserver 0.0.0.0:8001 #ejecutar proyecto con puerto abiertos
+```
+## Tips:
+Si se desea visualizar los modelos de la base de datos gráficas mente tipo **MER** (modelo entidad relacion) hacer lo siguiente:
+```sh 
+--instalar los siguientes paquetes y libreria
+$ sudo apt-get install graphviz libgraphviz-dev pkg-config  
+$ pip install pygraphviz #interfaz de Python para los gráficos
+$ pip install django-extensions 
+
+-- Añadir en el settings.py la siguiente app:
+
+INSTALLED_APPS = [  
+    ...
+    'django_extensions', 
+]
+```
+Para crear el gráfico se debe iniciar el siguiente comando al interior del proyecto:
+```sh 
+-- Genera un grafico del app seleccionada (api)
+$ python manage.py graph_models api -o APP_MODELS.png
+
+-- Genera grafico de todos los modelos incluyendo los que vienen por defecto de Django
+$ python3 manage.py graph_models --pygraphviz -a -g -o MER_ALL_MODELS.png
+```
 
 ## Configuraciones Iniciales
 
@@ -23,6 +74,7 @@ INSTALLED_APPS = [
  ...
  'rest_framework', #servicio rest
  'api', #app creada
+ 'django_extensions' #usamos esta libreria para generar el MER
 ]
 
 TIME_ZONE = 'CO'  # America/Bogota (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
@@ -31,17 +83,33 @@ TIME_ZONE = 'CO'  # America/Bogota (https://en.wikipedia.org/wiki/List_of_tz_dat
 -- app/models.py
 
 ```sh
-from django.db import models
 class Persona(models.Model):
- id = models.AutoField(primary_key = True)
- nombre = models.CharField('Nombre',max_length=100)
- apellido = models.CharField('Apellido',max_length=50)
+    id = models.AutoField(primary_key = True)
+    nombre = models.CharField('Nombre',max_length=100)
+    apellido = models.CharField('Apellido',max_length=50)
+    creado_por = models.ForeignKey(User, on_delete=models.CASCADE)
 
-def __str__(self):
- return  '{0},{1}'.format(self.apellido,self.nombre)
-class Meta:
- verbose_name = 'Persona'
- verbose_name_plural = 'Personas'
+    def __str__(self):
+      return '{0},{1}'.format(self.apellido,self.nombre)
+
+    class Meta:
+      verbose_name = 'Persona'
+      verbose_name_plural = 'Personas'
+
+class Vehiculo(models.Model):
+    id = models.AutoField(primary_key = True)
+    nombre = models.CharField('Nombre',max_length=100)
+    modelo = models.CharField('Modelo',max_length=50)
+    kilometraje = models.IntegerField('Kilometraje',default=0,null=True,blank=False)
+    personas = models.ManyToManyField(Persona,related_name="vehiculo_list", blank=True)
+
+    def __str__(self):
+          return 'Modelo: {0}, Kilometraje: {1}'.format(self.modelo,self.kilometraje)
+
+    class Meta:
+        verbose_name = 'Vehiculo'
+        verbose_name_plural = 'Vehiculos'
+        ordering = ['kilometraje']
 ```
 
 Registramos el modelo que creamos en el admin **api/admin.py**:
@@ -103,32 +171,33 @@ urlpatterns = [
 ```
 
 Con **Postman** se podra hacer la validación de los dos campos requeridos en método Post:
-![Postman validación](https://lh3.googleusercontent.com/Vm6M3Nd0aXqdGANjlt1jo59QvLfQnaY5lp2w-5uKGot16L3M8TNXpm8Mk3QBI42jtlMEl6Ik0Lro0kNdnShv32QYf51Z9yVnSAlFJRpML1YJQIYncb9SjEComyiqev-v0bC3pNSlrnTX4CC8W-caPtkmRzlS0ogQBSZYzMB5eYXrt_vQq-BmSImJUaM8XhUw-l2LoxMPAonwKltQLYs_XGf23LodK7hJ9ngQscALa8XF6dUyPuMO-bArmyjmNsH_b9Niy86hGGjC6hKbfvejDnpdRkYJ2-bcnrKn5yWEcFIjmRIGIS8H8cx3-22uuPDJAk4c87U7zEtN4bipfiikyV6kFrSv2JD6kyDhxAP4SaL3_h_JRZ0pzmq24gcWF5oDGh5QyHEaEWR_lG354ui4spVG6yTfIWGxerb2MfMBtz87zSzp0010WBiRr2C7f9qJl-hy0O1uSWXIG3WwfFiLPrTT-1VdAWD2pZDhFYPd887RXUO-TyymdizIL6HigM8QOlWbsUTyBjKB6cK3FhZv-Nzbi7O3laVnC_1sSjJB9RVxkHBkFXCel2KT6eLR3m8mOEdQdWhUifieVJ92Tm9XdCv3ebEaiSSOy28fNP3WWY3lhQbHYl5pAfhc14PVBFGlKI844giU_ZcehYv1o8pSPmzUKPGXXvzjexZ2LKRY7xIgZcMQY7Buj4KEStgH0A=w993-h604-no)
+
+![Postman validación token ](https://raw.githubusercontent.com/Dev-Lesmes/API-REST-Token/master/img_documentacion/testing_rest/api_generate_token.png)
 
 Otra herramienta para realizar la validación es **httpie**para validar por se requiere instalar.
 -- pip3 install httpie
 -- Para ejecutar por POST con esa libreria y general token se hace de la siguiente manera:
 
 ```sh
-http http://localhost:8000/api_generate_token/ username="admin" password="admin123"
+http http://localhost:8001/api_generate_token/ username="admin" password="admin123"
 ```
 
-![httpie validación](https://lh3.googleusercontent.com/-wdSDq0fDuNh2dndNhVttt2k2JOijo9JU1LmdF0b0wF9ZykVE3xi5k8qbVadOLFQxQWn7SZeO_HsBI42NS0jsEppqfkfXEpXms_veUVeIpUrhBpmfdvwjz8Lm501bZPoB01-OO7HUXAgSeYxalV6UDdR90GFfTr75g5QMsOxwfljxNNKzZxLIV88SvI-MHBby4WJ7XJPJUKlFaspKBSUtWSK0cNWvwZs_Rha1iTjpUaZTQtvx2Oc1fSB7Coqx_kZApDuBpivvTAvUu477OH7R4yn8pnrM18cSJBdMrjW1roORbQBfqTBcaT5MMzBjK4c-RjlrKRBJSn5KG03MQ5sU4G0XeKsMGO86P3WnXOxqM5LnxK_Z3sTTV-9G8mkV_Ahwb5RX0viKAhOADx9Qb2BKcKzv_G5WsxMmxVDXSEmVXZictZNPpcablfjdwYGt1GAxh3VY7SwN2oKaDW-B5QACnFGmxXSiHvJKUuMyDm3QHAw7XaZKVxYgajBiQ0USAILPUojXAp-cuFV4mguBP1kWKg_RZJWtnnCbpFD6ugTgyjyKkGb03UT4eSz4xQYPCxbRWeAHK_Mi2EJ2HGt5Xbf8tCAfb7qT-gn5oSurZTOgKtSsOUnpwVW97l7RUgDXtaQTv0pL8W8QQ4bwqJbfIoXOivZKnJZDnZ_N2-iFmcHudvfPTHrMBSNG3pmyuLc0SvcYeQ9lYf8A1Rw5WRUbsv-H-DST9hicy1tZ6hFsyJbu7RGIRvf-wttbN0=w1174-h250-no)
+![httpie validación](https://raw.githubusercontent.com/Dev-Lesmes/API-REST-Token/master/img_documentacion/testing_rest/2.htttpie_token.png)
 
 <hr>
 
 ### Token en lista de personas
 
-Es necesario que ahora nuestra lista de persona en la url [http://localhost:8000/api/1.0/persona/](http://localhost:8000/api/1.0/persona/) permite la autenticación buscando el token automáticamente.
+Es necesario que ahora nuestra lista de persona en la url [http://localhost:8000/api/1.0/persona/](http://localhost:8001/api/1.1/personas/) permite la autenticación buscando el token automáticamente.
 
 De la manera manual seria de esta manera con **httpie**:
 
 ```sh
-http http://localhost:8000/api/1.0/persona/ "Authorization: Token 62c36405d4927915d24afd1b0baeb1931183b052"
+http http://localhost:8001/api/1.1/personas/ "Authorization: Basic YWRtaW46YWRtaW4xMjM="
 ```
+Actualmente para que la conecciión se exito con **PowerBI** se quiere que el parametro de acceso sea con **Authorization basic** de la siguiente manera:
 
-En **Postman** seria de la siguiente manera:
-![postman validación lista de personas](https://lh3.googleusercontent.com/KIndtpZ-81yiBIf2yKjfkw0KhBo915SooU4D3TrQvY6-E8dou_uXvrrPPAuFbN9Wxpv5VmknghoyGrrktIXO1W7Dl4ltFwo7x7RHqcb3rmWJuXbVDkjB6UwOIZi1Uj-f_6hmWYnwYe8U1Wpw9-bXUXjXGpMe_D0biouX5ZeAM1rrH8khfwYNZAuOHohmkK7nR4J1vE7vD5xmBMkexBIeZc2-Vzxw_CI35ZKvJ7jsx0Qp2BdRw-jHoQgx2o8e23TiS6Ra3gazz5oF4uZXc7UrSMcFHK6egDgY7yhkW2gxfrnBHJfkNtq1GmgFvzMKNOjqLB4td3_megcZE7-AQuiz_kHDTBgRqvbRXC-EiRgfTT6Xr8qCTL5ffGfeWoGzwv3W52zl8Uz15GKVAEeHv4fgcVE_gsBtE00Xv742TZWFH4yfjsBPdLpb_mMwFU6BSgZaHVEgLUNUB14B6fjKeunqNE3NA7W-jUbx1Cb8ds3rpb8EjTtOYmVElsV1ZwfWes5HcKhsktfGNjeigwYK_0bFtV45zXmiopBWa3DOETBQhH7g1SXyoKtKtsw0r8Dj8dURMvxrpZ5HaPqIL1AmOzm9paE6jry2ycqJVDI-gHFlwrfykTrXnGaVEu2J0TSIkrkFFuAHm39IYgNMppHn--BhOi7mGtM5gbM1UhhJqJaPj443MlQfJFcpbDmXae7Yxg=w980-h729-no)
+![postman validación lista de personas](https://raw.githubusercontent.com/Dev-Lesmes/API-REST-Token/master/img_documentacion/testing_rest/3.postman_lista_personas.png)
 
 ## Login y Logout Token authentication
 
@@ -195,3 +264,45 @@ MIDDLEWARE_CLASSES = [
     ...
 ]
 ```
+## PowerBI
+
+Para realizar la conexión como anteriormente se menciono es importante que se tenga el CORS activo, que la autenticación sea basic y que la estructura del json se comporte de la siguiente manera:
+
+```sh
+[
+    {
+        "id": 1,
+        "nombre": "Kia",
+        "modelo": "RIO2020",
+        "kilometraje": 0,
+        "personas": [
+            {
+                "id": 1,
+                "nombre": "Dev",
+                "apellido": "Lesmes",
+                "creado_por": 1
+            },
+            {
+                "id": 2,
+                "nombre": "Nombre",
+                "apellido": "Apellido",
+                "creado_por": 1
+            }
+        ]
+]
+```
+1. La conexión se hace de esta forma web en la que se envia el valor el autentication basic, con la ip del equipo en el que se encuentra el API:
+![1.Conexion_con_Autorizacion_PowerBI](https://raw.githubusercontent.com/Dev-Lesmes/API-REST-Token/master/img_documentacion/powerbi/1.Conexion_con_Autorizacion_PowerBI.png)
+
+2. En la edición de consultas para pasar parámetros de manera dinámica:
+![1.Conexion_con_Autorizacion_PowerBI](https://raw.githubusercontent.com/Dev-Lesmes/API-REST-Token/master/img_documentacion/powerbi/2.JSON_a_Tabla_PowerBI.png)
+
+3.  Se deben expandir los datos y seleccionar las columnas para poder acceder a los submodulos:
+![1.Conexion_con_Autorizacion_PowerBI](https://raw.githubusercontent.com/Dev-Lesmes/API-REST-Token/master/img_documentacion/powerbi/3.Expandir_listar_internas_PowerBI.png)
+
+4. PowerBi por defecto genera unas relaciones pero no son las mas apropiadas así que hay que indicarle como sera su relación y quedaría de la siguiente manera:
+![1.Conexion_con_Autorizacion_PowerBI](https://raw.githubusercontent.com/Dev-Lesmes/API-REST-Token/master/img_documentacion/powerbi/5.Relaciones_PowerBI)
+
+
+5. Este es el resultado 
+![1.Conexion_con_Autorizacion_PowerBI](https://raw.githubusercontent.com/Dev-Lesmes/API-REST-Token/master/img_documentacion/powerbi/4.Grafica_PowerBI.png)

@@ -5,3 +5,7 @@ djangorestframework==3.11
 httpie
 coreapi
 django-rest-swagger
+django-extensions
+pygraphviz
+libgraphviz-dev
+pkg-config

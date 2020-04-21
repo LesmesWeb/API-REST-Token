@@ -42,9 +42,13 @@ INSTALLED_APPS = [
     'api', #app creada
     'rest_framework_swagger', #documentación
     'corsheaders', #Cors
+    'django_extensions' #usamos esta libreria para generar el MER
 ]
 
 
+REST_FRAMEWORK = { 
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
+}
 
 
 MIDDLEWARE = [
